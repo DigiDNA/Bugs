@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		052457EA1FAE1AB40061E705 /* ASL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052457E71FAE1AB40061E705 /* ASL.swift */; };
+		052457EB1FAE1AB40061E705 /* ASLSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052457E81FAE1AB40061E705 /* ASLSender.swift */; };
+		052457EC1FAE1AB40061E705 /* ASLMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052457E91FAE1AB40061E705 /* ASLMessage.swift */; };
 		055632301E68BC7300CE1AD7 /* Bugs.AboutWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0556322E1E68BC7300CE1AD7 /* Bugs.AboutWindowController.xib */; };
 		0556324B1E69C0C500CE1AD7 /* Bugs.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0556324A1E69C0C500CE1AD7 /* Bugs.icns */; };
 		0556512A1F87D0430068EA35 /* ApplicationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055651291F87D0430068EA35 /* ApplicationDelegate.swift */; };
@@ -73,6 +76,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		052457E71FAE1AB40061E705 /* ASL.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ASL.swift; sourceTree = "<group>"; };
+		052457E81FAE1AB40061E705 /* ASLSender.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ASLSender.swift; sourceTree = "<group>"; };
+		052457E91FAE1AB40061E705 /* ASLMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ASLMessage.swift; sourceTree = "<group>"; };
 		0556322F1E68BC7300CE1AD7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Bugs.AboutWindowController.xib; sourceTree = "<group>"; };
 		0556324A1E69C0C500CE1AD7 /* Bugs.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Bugs.icns; sourceTree = "<group>"; };
 		055651291F87D0430068EA35 /* ApplicationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationDelegate.swift; sourceTree = "<group>"; };
@@ -118,6 +124,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		052457E61FAE1AB40061E705 /* ASL */ = {
+			isa = PBXGroup;
+			children = (
+				052457E71FAE1AB40061E705 /* ASL.swift */,
+				052457E81FAE1AB40061E705 /* ASLSender.swift */,
+				052457E91FAE1AB40061E705 /* ASLMessage.swift */,
+			);
+			path = ASL;
+			sourceTree = "<group>";
+		};
 		055F18781F89065800EBDEE1 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -168,6 +184,7 @@
 		05C34B4A1E660EE4000A7026 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				052457E61FAE1AB40061E705 /* ASL */,
 				05DFC7E61F8690E0002E9F6A /* AboutWindowController.swift */,
 				057F15791F86926000BD4BF8 /* Application.swift */,
 				055651291F87D0430068EA35 /* ApplicationDelegate.swift */,
@@ -331,15 +348,18 @@
 				057F157A1F86926000BD4BF8 /* Application.swift in Sources */,
 				05D727641F86D5C200D58AF7 /* DiagnosticReport.swift in Sources */,
 				0556512A1F87D0430068EA35 /* ApplicationDelegate.swift in Sources */,
+				052457EA1FAE1AB40061E705 /* ASL.swift in Sources */,
 				055F18761F88F3D600EBDEE1 /* NSArrayController.swift in Sources */,
 				0556512C1F87D6560068EA35 /* PreferencesWindowController.swift in Sources */,
 				057F15871F86BB4500BD4BF8 /* ArrayIsEmptyValueTransformer.swift in Sources */,
 				057F158B1F86BD1A00BD4BF8 /* DiagnosticReportGroup.swift in Sources */,
 				0556512E1F87E4EF0068EA35 /* Preferences.swift in Sources */,
+				052457EC1FAE1AB40061E705 /* ASLMessage.swift in Sources */,
 				055651301F87F8310068EA35 /* MainWindowController.swift in Sources */,
 				057F157F1F86B6E300BD4BF8 /* ArrayCountIsGreaterThanOneValueTransformer.swift in Sources */,
 				057F15851F86BACC00BD4BF8 /* ArrayCountValueTransformer.swift in Sources */,
 				057F15891F86BB8700BD4BF8 /* ArrayIsNotEmptyValueTransformer.swift in Sources */,
+				052457EB1FAE1AB40061E705 /* ASLSender.swift in Sources */,
 				05DFC7E71F8690E0002E9F6A /* AboutWindowController.swift in Sources */,
 				057F15811F86B99500BD4BF8 /* ArrayCountIsOneValueTransformer.swift in Sources */,
 			);
