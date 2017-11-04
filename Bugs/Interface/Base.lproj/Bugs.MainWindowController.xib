@@ -9,10 +9,10 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="MainWindowController" customModule="Bugs" customModuleProvider="target">
             <connections>
+                <outlet property="diagnosticsTextView" destination="066-mu-uyw" id="8Mx-6V-BsG"/>
                 <outlet property="groupController" destination="zmL-8U-v1s" id="BfY-Og-HDu"/>
                 <outlet property="reportsController" destination="oyC-n7-yxo" id="wU5-os-AR8"/>
                 <outlet property="reportsTableView" destination="qTw-SL-r9e" id="kkb-Lg-FLJ"/>
-                <outlet property="textView" destination="066-mu-uyw" id="9Ay-ng-Mc0"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="jDL-dC-QIL"/>
             </connections>
         </customObject>

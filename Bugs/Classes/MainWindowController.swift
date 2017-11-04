@@ -27,17 +27,36 @@ import Quartz
 
 @objc class MainWindowController: NSWindowController, NSTableViewDelegate, NSTableViewDataSource, QLPreviewPanelDelegate, QLPreviewPanelDataSource, NSMenuDelegate
 {
-    @objc private dynamic var groups:       [ DiagnosticReportGroup ] = []
-    @objc private dynamic var editable:     Bool                      = false
-    @objc private dynamic var initializing: Bool                      = false
-    @objc private dynamic var loading:      Bool                      = false
-    @objc private dynamic var copying:      Bool                      = false
-    @objc private dynamic var observations: [ NSKeyValueObservation ] = []
+    @objc private dynamic var groups:                                [ DiagnosticReportGroup ] = []
+    @objc private dynamic var editable:                              Bool                      = false
+    @objc private dynamic var initializing:                          Bool                      = false
+    @objc private dynamic var loading:                               Bool                      = false
+    @objc private dynamic var copying:                               Bool                      = false
+    @objc private dynamic var observations:                          [ NSKeyValueObservation ] = []
+    @objc private dynamic var asl:                                   ASL?
+    @objc private dynamic var aslTextViewContainerHiddenConstraint:  NSLayoutConstraint?
+    @objc private dynamic var aslTextViewContainerVisibleConstraint: NSLayoutConstraint?
     
-    @objc @IBOutlet private dynamic var groupController:   NSArrayController?
-    @objc @IBOutlet private dynamic var reportsController: NSArrayController?
-    @objc @IBOutlet private dynamic var reportsTableView:  NSTableView?
-    @objc @IBOutlet private dynamic var textView:          NSTextView?
+    @objc @IBOutlet private dynamic var groupController:         NSArrayController?
+    @objc @IBOutlet private dynamic var reportsController:       NSArrayController?
+    @objc @IBOutlet private dynamic var sendersArrayController:  NSArrayController?
+    @objc @IBOutlet private dynamic var messagesArrayController: NSArrayController?
+    @objc @IBOutlet private dynamic var reportsTableView:        NSTableView?
+    @objc @IBOutlet private dynamic var diagnosticsTextView:     NSTextView?
+    @objc @IBOutlet private dynamic var aslTextView:             NSTextView?
+    @objc @IBOutlet private dynamic var aslTextViewContainer:    NSView?
+    
+    convenience init()
+    {
+        self.init( sender: nil )
+    }
+    
+    convenience init( sender: String? )
+    {
+        self.init( windowNibName: NSNib.Name( NSStringFromClass( type( of: self ) ) ) )
+        
+        self.asl = ASL( sender: sender )
+    }
     
     override var windowNibName: NSNib.Name?
     {
@@ -50,23 +69,94 @@ import Quartz
         
         self.window?.titlebarAppearsTransparent = true
         self.window?.titleVisibility            = .hidden
-        self.groupController?.sortDescriptors   = [ NSSortDescriptor( key: "name", ascending: true ) ]
-        self.reportsController?.sortDescriptors = [ NSSortDescriptor( key: "date", ascending: false ) ]
-        self.textView?.textContainerInset       = NSMakeSize( 10.0, 15.0 )
         
-        let o1 = Preferences.shared.observe( \.fontName         ) { ( o, c ) in self.updateDisplaySettings() }
-        let o2 = Preferences.shared.observe( \.fontSize         ) { ( o, c ) in self.updateDisplaySettings() }
-        let o3 = Preferences.shared.observe( \.backgroundColorR ) { ( o, c ) in self.updateDisplaySettings() }
-        let o4 = Preferences.shared.observe( \.backgroundColorG ) { ( o, c ) in self.updateDisplaySettings() }
-        let o5 = Preferences.shared.observe( \.backgroundColorB ) { ( o, c ) in self.updateDisplaySettings() }
-        let o6 = Preferences.shared.observe( \.foregroundColorR ) { ( o, c ) in self.updateDisplaySettings() }
-        let o7 = Preferences.shared.observe( \.foregroundColorG ) { ( o, c ) in self.updateDisplaySettings() }
-        let o8 = Preferences.shared.observe( \.foregroundColorB ) { ( o, c ) in self.updateDisplaySettings() }
+        self.asl?.start()
         
-        self.observations.append( contentsOf: [ o1, o2, o3, o4, o5, o6, o7, o8 ] )
+        self.groupController?.sortDescriptors         = [ NSSortDescriptor( key: "name", ascending: true ) ]
+        self.reportsController?.sortDescriptors       = [ NSSortDescriptor( key: "date", ascending: false ) ]
+        self.sendersArrayController?.sortDescriptors  = [ NSSortDescriptor( key: "name", ascending: true ) ]
+        self.messagesArrayController?.sortDescriptors = [ NSSortDescriptor( key: "time", ascending: false ) ]
+        
+        self.diagnosticsTextView?.textContainerInset = NSMakeSize( 10.0, 15.0 )
+        self.aslTextView?.textContainerInset         = NSMakeSize( 10.0, 15.0 )
+        
+        let o1 = self.asl?.observe( \.messages )
+        {
+            ( o, c ) in
+            
+            if( self.sendersArrayController?.selectedObjects.count == 0 )
+            {
+                self.messagesArrayController?.content = self.asl?.messages
+            }
+            else
+            {
+                self.messagesArrayController?.content = self.sendersArrayController?.value( forKeyPath: "selection.@unionOfArrays.messages" )
+            }
+        }
+        
+        let o2 = self.sendersArrayController?.observe( \.selection )
+        {
+            ( o, c ) in
+            
+            if( self.sendersArrayController?.selectionIndexes.count == 0 )
+            {
+                self.messagesArrayController?.content = self.asl?.messages
+            }
+            else
+            {
+                self.messagesArrayController?.content = self.sendersArrayController?.value( forKeyPath: "selection.@unionOfArrays.messages" )
+            }
+        }
+        
+        let o3 = self.messagesArrayController?.observe( \.selection )
+        {
+            ( o, c ) in
+            
+            if( self.messagesArrayController?.selectionIndexes.count != 1 )
+            {
+                self.aslTextViewContainerVisibleConstraint?.isActive = false
+                self.aslTextViewContainerHiddenConstraint?.isActive  = true
+            }
+            else
+            {
+                self.aslTextViewContainerHiddenConstraint?.isActive  = false
+                self.aslTextViewContainerVisibleConstraint?.isActive = true
+            }
+        }
+        
+        if( o1 != nil ) { self.observations.append( o1! ) }
+        if( o2 != nil ) { self.observations.append( o2! ) }
+        if( o3 != nil ) { self.observations.append( o3! ) }
+        
+        self.messagesArrayController?.content = self.asl?.messages
+        
+        let o4  = Preferences.shared.observe( \.fontName         ) { ( o, c ) in self.updateDisplaySettings() }
+        let o5  = Preferences.shared.observe( \.fontSize         ) { ( o, c ) in self.updateDisplaySettings() }
+        let o6  = Preferences.shared.observe( \.backgroundColorR ) { ( o, c ) in self.updateDisplaySettings() }
+        let o7  = Preferences.shared.observe( \.backgroundColorG ) { ( o, c ) in self.updateDisplaySettings() }
+        let o8  = Preferences.shared.observe( \.backgroundColorB ) { ( o, c ) in self.updateDisplaySettings() }
+        let o9  = Preferences.shared.observe( \.foregroundColorR ) { ( o, c ) in self.updateDisplaySettings() }
+        let o10 = Preferences.shared.observe( \.foregroundColorG ) { ( o, c ) in self.updateDisplaySettings() }
+        let o11 = Preferences.shared.observe( \.foregroundColorB ) { ( o, c ) in self.updateDisplaySettings() }
+        
+        self.observations.append( contentsOf: [ o4, o5, o6, o7, o8, o9, o10, o11 ] )
         
         self.updateDisplaySettings()
         self.reload( nil )
+        
+        for constraint in self.aslTextViewContainer?.constraints ?? []
+        {
+            if( constraint.firstAttribute == .height )
+            {
+                constraint.isActive                        = false
+                self.aslTextViewContainerVisibleConstraint = constraint
+                self.aslTextViewContainerHiddenConstraint  = NSLayoutConstraint( item: self.aslTextViewContainer!, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .height, multiplier: 0.0, constant: 0.0 )
+                
+                self.aslTextViewContainer?.addConstraint( self.aslTextViewContainerHiddenConstraint! )
+                
+                break
+            }
+        }
     }
     
     @objc private func updateDisplaySettings() -> Void
@@ -96,9 +186,12 @@ import Quartz
         let background = NSColor( deviceRed: Preferences.shared.backgroundColorR, green: Preferences.shared.backgroundColorG, blue: Preferences.shared.backgroundColorB, alpha: 1.0 )
         let foreground = NSColor( deviceRed: Preferences.shared.foregroundColorR, green: Preferences.shared.foregroundColorG, blue: Preferences.shared.foregroundColorB, alpha: 1.0 )
         
-        self.textView?.font            = font
-        self.textView?.backgroundColor = background
-        self.textView?.textColor       = foreground
+        self.diagnosticsTextView?.font            = font
+        self.aslTextView?.font                    = font
+        self.diagnosticsTextView?.backgroundColor = background
+        self.aslTextView?.backgroundColor         = background
+        self.diagnosticsTextView?.textColor       = foreground
+        self.aslTextView?.textColor               = foreground
     }
     
     @objc private func clickedOrSelectedItems() -> [ DiagnosticReport ]
@@ -157,7 +250,7 @@ import Quartz
     
     @objc private func performFindPanelAction( _ sender: Any ) -> Void
     {
-        self.textView?.performTextFinderAction( sender )
+        self.diagnosticsTextView?.performTextFinderAction( sender )
     }
     
     @objc @IBAction private func open( _ sender: Any? ) -> Void
@@ -361,6 +454,25 @@ import Quartz
         }
     }
     
+    @objc @IBAction func clearAllMessages( _ sender: Any? )
+    {
+        var senders: [ ASLSender ]?
+        
+        if( self.sendersArrayController?.selectedObjects.count != 0 )
+        {
+            senders = self.sendersArrayController?.selectedObjectsArray()
+        }
+        else
+        {
+            senders = self.sendersArrayController?.arrangedObjectsArray()
+        }
+        
+        for s in senders ?? []
+        {
+            s.clear()
+        }
+    }
+    
     @objc @IBAction private func reload( _ sender: Any? ) -> Void
     {
         if( self.loading )
@@ -548,38 +660,61 @@ import Quartz
     
     func tableView( _ tableView: NSTableView, writeRowsWith rowIndexes: IndexSet, to pboard: NSPasteboard ) -> Bool
     {
-        if( tableView != self.reportsTableView )
+        if( tableView == self.reportsTableView )
         {
+            tableView.setDraggingSourceOperationMask( .copy, forLocal: false )
+            
+            guard let items = ( self.reportsController?.arrangedObjects as? NSArray )?.objects( at: rowIndexes ) else
+            {
+                return false
+            }
+            
+            var extenions = [ String ]()
+            var contents  = [ String ]()
+            
+            for item in items as! [ DiagnosticReport ]
+            {
+                let ext = ( item.path as NSString ).pathExtension 
+                
+                extenions.append( ext )
+                contents.append( item.contents )
+            }
+            
+            if( extenions.count > 0 )
+            {
+                pboard.setPropertyList( extenions, forType: .filePromise )
+                pboard.setString( contents.joined( separator: "\n\n--------------------------------------------------------------------------------\n\n" ), forType: .string )
+                
+                return true
+            }
+            
             return false
         }
-        
-        tableView.setDraggingSourceOperationMask( .copy, forLocal: false )
-        
-        guard let items = ( self.reportsController?.arrangedObjects as? NSArray )?.objects( at: rowIndexes ) else
+        else
         {
+            tableView.setDraggingSourceOperationMask( .copy, forLocal: false )
+            
+            guard let messages = ( self.messagesArrayController?.arrangedObjects as? NSArray )?.objects( at: rowIndexes ) else
+            {
+                return false
+            }
+            
+            var contents = [ String ]()
+            
+            for message in messages as! [ ASLMessage ]
+            {
+                contents.append( message.message )
+            }
+            
+            if( contents.count > 0 )
+            {
+                pboard.setString( contents.joined( separator: "\n\n--------------------------------------------------------------------------------\n\n" ), forType: .string )
+                
+                return true
+            }
+            
             return false
         }
-        
-        var extenions = [ String ]()
-        var contents  = [ String ]()
-        
-        for item in items as! [ DiagnosticReport ]
-        {
-            let ext = ( item.path as NSString ).pathExtension 
-            
-            extenions.append( ext )
-            contents.append( item.contents )
-        }
-        
-        if( extenions.count > 0 )
-        {
-            pboard.setPropertyList( extenions, forType: .filePromise )
-            pboard.setString( contents.joined( separator: "\n\n--------------------------------------------------------------------------------\n\n" ), forType: .string )
-            
-            return true
-        }
-        
-        return false
     }
     
     func tableView( _ tableView: NSTableView, namesOfPromisedFilesDroppedAtDestination dropDestination: URL, forDraggedRowsWith indexSet: IndexSet ) -> [ String ]
