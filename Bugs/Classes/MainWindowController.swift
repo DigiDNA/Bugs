@@ -34,10 +34,10 @@ import Quartz
     @objc private dynamic var copying:      Bool                      = false
     @objc private dynamic var observations: [ NSKeyValueObservation ] = []
     
-    @IBOutlet @objc private dynamic var groupController:   NSArrayController?
-    @IBOutlet @objc private dynamic var reportsController: NSArrayController?
-    @IBOutlet @objc private dynamic var reportsTableView:  NSTableView?
-    @IBOutlet @objc private dynamic var textView:          NSTextView?
+    @objc @IBOutlet private dynamic var groupController:   NSArrayController?
+    @objc @IBOutlet private dynamic var reportsController: NSArrayController?
+    @objc @IBOutlet private dynamic var reportsTableView:  NSTableView?
+    @objc @IBOutlet private dynamic var textView:          NSTextView?
     
     override var windowNibName: NSNib.Name?
     {
@@ -86,6 +86,11 @@ import Quartz
         if( font == nil )
         {
             font = NSFont( name: "Monaco", size: 10 )
+        }
+        
+        if( font == nil )
+        {
+            font = NSFont.userFixedPitchFont( ofSize: 10 )
         }
         
         let background = NSColor( deviceRed: Preferences.shared.backgroundColorR, green: Preferences.shared.backgroundColorG, blue: Preferences.shared.backgroundColorB, alpha: 1.0 )
@@ -155,7 +160,7 @@ import Quartz
         self.textView?.performTextFinderAction( sender )
     }
     
-    @objc private func open( _ sender: Any? ) -> Void
+    @objc @IBAction private func open( _ sender: Any? ) -> Void
     {
         self.openReports( self.clickedOrSelectedItems() )
     }
@@ -356,7 +361,7 @@ import Quartz
         }
     }
     
-    @objc private func reload( _ sender: Any? ) -> Void
+    @objc @IBAction private func reload( _ sender: Any? ) -> Void
     {
         if( self.loading )
         {

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13196" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13196"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13529"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
         <capability name="system font weights other than Regular or Bold" minToolsVersion="7.0"/>
     </dependencies>
@@ -89,7 +89,7 @@
                                     <string key="NSValueTransformerName">Bugs.ArrayIsNotEmptyValueTransformer</string>
                                 </dictionary>
                             </binding>
-                            <binding destination="-2" name="hidden2" keyPath="initializing" previousBinding="oY4-vG-j20" id="b1d-AF-Cqq">
+                            <binding destination="-2" name="hidden3" keyPath="copying" previousBinding="b1d-AF-Cqq" id="2ac-Qm-r8e">
                                 <dictionary key="options">
                                     <integer key="NSMultipleValuesPlaceholder" value="-1"/>
                                     <integer key="NSNoSelectionPlaceholder" value="-1"/>
@@ -97,7 +97,7 @@
                                     <integer key="NSNullPlaceholder" value="-1"/>
                                 </dictionary>
                             </binding>
-                            <binding destination="-2" name="hidden3" keyPath="copying" previousBinding="b1d-AF-Cqq" id="2ac-Qm-r8e">
+                            <binding destination="-2" name="hidden2" keyPath="initializing" previousBinding="oY4-vG-j20" id="b1d-AF-Cqq">
                                 <dictionary key="options">
                                     <integer key="NSMultipleValuesPlaceholder" value="-1"/>
                                     <integer key="NSNoSelectionPlaceholder" value="-1"/>
